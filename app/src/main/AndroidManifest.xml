@@ -16,7 +16,8 @@
                 <category android:name="android.intent.category.LAUNCHER" />
             </intent-filter>
         </activity>
-        <activity android:name=".selectFromCameraRoll"></activity>
+        <activity android:name=".selectFromCameraRoll" />
+        <activity android:name=".results"></activity>
     </application>
 
 </manifest>

@@ -36,16 +36,22 @@ public class selectFromCameraRoll extends AppCompatActivity {
             public void onClick(View view){
                 //do stuff
                 analysisButton.setText("Analyzing...");
+                analyzeImage();
+                displayResults();
             }
         });
-
-
 
     }
 
 
     private void analyzeImage(){
+        //do stuff
 
+    }
+
+    private void displayResults(){
+        Intent results = new Intent(selectFromCameraRoll.this, results.class);
+        startActivity(results);
     }
 
 
