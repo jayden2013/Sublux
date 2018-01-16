@@ -4,14 +4,15 @@ import android.Manifest;
 import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
+import android.graphics.Color;
 import android.os.Bundle;
 import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
-import android.widget.Toast;
 
 import java.io.File;
+import java.util.ArrayList;
 
 public class results extends AppCompatActivity {
 
@@ -48,12 +49,37 @@ public class results extends AppCompatActivity {
             //Access file
             Bitmap bmp = BitmapFactory.decodeFile(path + "/1.jpeg");
 
+            int width = bmp.getWidth(); //Set Width;
+            int height = bmp.getWidth(); //Set Height;
+            int x = 0, y = 0; //Initialize X + Y
+            int totalPixels = width * height; //Calculate Total Pixel
+            PixelObject pixel; //Pixel object for storing values.
+            ArrayList<PixelObject> pixelArray = new ArrayList<PixelObject>(); //ArrayList for storing Pixels
 
-            //Testing to see if we can display properties...
-            Toast toastHeight = Toast.makeText(this, "" + bmp.getHeight(), Toast.LENGTH_LONG);
-            toastHeight.show();
-            //And yes, we can...
+            //Analyze pixel by pixel
+            while (y < height) { //Change height value when testing to something more reasonable, so that we don't run out of memory.
+                while (x < width) {
+                    pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y))); //Create new pixel object using values.
+                    pixelArray.add(pixel); //Add to pixel Array
+                    x++;
+                }
+                y++;
+                x = 0;
+            }
 
+            analyzePixels(pixelArray); //Analyze the pixels
+
+    }
+
+    /**
+     * Analyze pixels
+     * @param pixelArray
+     */
+    public void analyzePixels(ArrayList<PixelObject> pixelArray){
+
+        //Uhhhhhhh so try to analyze the pixels and if they're close enough to a white background, or black background??? make them white or black. Otherwise, keep color or make color opposite idk.
+        //Doing this will allow for easier analysis probably.
+        System.out.println("done");
 
     }
 
