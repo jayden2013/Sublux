@@ -6,18 +6,17 @@ import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
 import android.os.Bundle;
-import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
+import android.widget.Toast;
 
-import java.io.File;
 import java.util.ArrayList;
 
 public class results extends AppCompatActivity {
 
-    String imageURI = "";
+    String imagePath = "";
     int width = 0, height = 0;
     Bitmap result;
 
@@ -26,12 +25,7 @@ public class results extends AppCompatActivity {
         super.onCreate(savedInstanceState);
         setContentView(R.layout.activity_results);
         Intent i = getIntent();
-        //System.out.println(i.getStringExtra("imageURI")); //Testing
-        this.imageURI = i.getStringExtra("imageURI"); //Set Image URI
-
-//        //Temporary Bubble Text
-//        Toast toast = Toast.makeText(this, imageURI, Toast.LENGTH_LONG);
-//        toast.show(); //Show Bubble Text
+        this.imagePath = i.getStringExtra("imagePath"); //Set Image Path
         analyzeImage();
     }
 
@@ -40,8 +34,6 @@ public class results extends AppCompatActivity {
      */
     public void analyzeImage(){
 
-        File path = Environment.getExternalStoragePublicDirectory(Environment.DIRECTORY_DOWNLOADS); //Directory is downloads, but will need to be changed in full implementation.
-
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
         System.out.println("Current Permissions: " + permissionCheck); //Print current permissions to log in Android Studio.
 
@@ -49,11 +41,10 @@ public class results extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
             //Access file
-        System.out.println(path);
-            Bitmap bmp = BitmapFactory.decodeFile(path + "/2.jpg"); //hardcoded the filepath until i get image analysis perfected.
-            final int OFFSET = 45;
-            width = bmp.getWidth(); //Set Width;
-            height = bmp.getWidth(); //Set Height;
+            Bitmap bmp = BitmapFactory.decodeFile(imagePath); //This is the image to be analyzed, now dynamic.
+            final int OFFSET = 45; //Offset for RGB Threshold.
+            width = bmp.getWidth(); //Set Width
+            height = bmp.getWidth(); //Set Height
             int x = 0, y = 0; //Initialize X + Y
             int totalPixels = width * height; //Calculate Total Pixel
             PixelObject pixel; //Pixel object for storing values.
@@ -80,11 +71,10 @@ public class results extends AppCompatActivity {
                     else{
                         result.setPixel(x,y, Color.BLUE);
                     }
-
-                    x++;
+                    x++; //Increment column position.
                 }
-                y++;
-                x = 0;
+                y++; //Increment row position.
+                x = 0; //New row, reset column position.
             }
 
             modifiedImageView.setImageBitmap(result); //Set the modifiedImageView to the resulting bitmap.
@@ -101,6 +91,15 @@ public class results extends AppCompatActivity {
         //do stuff
 
         return 0; //Return an offset maybe of how offset the posture is?
+    }
+
+    /**
+     * Displays the results of the image analysis with a toast.
+     */
+    public void displayResults(){
+        //Temporary toast until full image analysis is complete.
+        Toast resultToast = Toast.makeText(this, "oh noes bad posture", Toast.LENGTH_LONG);
+        resultToast.show(); //Show Bubble Text
     }
 
 

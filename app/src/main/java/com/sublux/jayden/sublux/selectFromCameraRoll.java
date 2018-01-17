@@ -1,6 +1,7 @@
 package com.sublux.jayden.sublux;
 
 import android.content.Intent;
+import android.database.Cursor;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -28,7 +29,6 @@ public class selectFromCameraRoll extends AppCompatActivity {
             }
         });
 
-
         //Image Analysis Button
         final Button analysisButton = (Button) findViewById(R.id.analysisButton);
         analysisButton.setOnClickListener(new View.OnClickListener(){
@@ -36,22 +36,14 @@ public class selectFromCameraRoll extends AppCompatActivity {
             public void onClick(View view){
                 //do stuff
                 analysisButton.setText("Analyzing...");
-                analyzeImage();
                 displayResults();
             }
         });
-
-    }
-
-
-    private void analyzeImage(){
-        //do stuff
-
     }
 
     private void displayResults(){
         Intent results = new Intent(selectFromCameraRoll.this, results.class);
-        results.putExtra("imageURI", imageUri.getEncodedPath()); //Put Extra to access on following screen.
+        results.putExtra("imagePath", getImagePath(imageUri)); //Put Extra to access selected image on following screen.
         System.out.println(imageUri.getEncodedPath());
         startActivity(results);
     }
@@ -61,15 +53,38 @@ public class selectFromCameraRoll extends AppCompatActivity {
     private void openGallery(){
         Intent gallery = new Intent(Intent.ACTION_PICK, MediaStore.Images.Media.INTERNAL_CONTENT_URI);
         startActivityForResult(gallery, PICK_IMAGE);
+
     }
 
     @Override
     protected void onActivityResult(int requestCode, int resultCode, Intent data){
         super.onActivityResult(requestCode, resultCode, data);
         if(resultCode == RESULT_OK && requestCode == PICK_IMAGE){
-            imageUri = data.getData();
-            imageView.setImageURI(imageUri);
+            imageUri = data.getData(); //Get imageUri
+            imageView.setImageURI(imageUri); //Set imageView to selected image.
         }
+    }
+
+    /**
+     * https://stackoverflow.com/questions/20067508/get-real-path-from-uri-android-kitkat-new-storage-access-framework
+     * @param uri
+     * @return
+     */
+    public String getImagePath(Uri uri){
+        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        cursor.moveToFirst();
+        String document_id = cursor.getString(0);
+        document_id = document_id.substring(document_id.lastIndexOf(":")+1);
+        cursor.close();
+
+        cursor = getContentResolver().query(
+                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+                null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+        cursor.moveToFirst();
+        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+        cursor.close();
+
+        return path;
     }
 
 }
