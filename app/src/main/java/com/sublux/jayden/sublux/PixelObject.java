@@ -7,13 +7,18 @@ package com.sublux.jayden.sublux;
 
 public class PixelObject {
 
-    int red = 0, green = 0, blue = 0; //Initialize variables.
+    int red = 0, green = 0, blue = 0, color = 0; //Initialize variables.
 
-    public PixelObject(int r, int g, int b) {
+    public PixelObject(int r, int g, int b, int c) {
         //Set RGB values.
         this.red = r;
         this.green = g;
         this.blue = b;
+    }
+
+    //Returns the color value
+    public int getColor(){
+        return this.color;
     }
 
     //Returns Red Value
@@ -48,8 +53,9 @@ public class PixelObject {
         return this.blue == b;
     }
 
-
-
-
-
+    //Sets the color value, returns if value was successfully set.
+    public boolean setColor(int c){
+        this.color = c;
+        return this.color == c;
+    }
 }

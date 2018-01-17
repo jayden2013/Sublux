@@ -10,6 +10,7 @@ import android.os.Environment;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.widget.ImageView;
 
 import java.io.File;
 import java.util.ArrayList;
@@ -17,6 +18,8 @@ import java.util.ArrayList;
 public class results extends AppCompatActivity {
 
     String imageURI = "";
+    int width = 0, height = 0;
+    Bitmap result;
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -32,7 +35,6 @@ public class results extends AppCompatActivity {
         analyzeImage();
     }
 
-
     /**
      * Method to Analyze an image, probably pixel by pixel. We shall see.
      */
@@ -47,40 +49,59 @@ public class results extends AppCompatActivity {
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
             //Access file
-            Bitmap bmp = BitmapFactory.decodeFile(path + "/1.jpeg");
-
-            int width = bmp.getWidth(); //Set Width;
-            int height = bmp.getWidth(); //Set Height;
+        System.out.println(path);
+            Bitmap bmp = BitmapFactory.decodeFile(path + "/2.jpg"); //hardcoded the filepath until i get image analysis perfected.
+            final int OFFSET = 45;
+            width = bmp.getWidth(); //Set Width;
+            height = bmp.getWidth(); //Set Height;
             int x = 0, y = 0; //Initialize X + Y
             int totalPixels = width * height; //Calculate Total Pixel
             PixelObject pixel; //Pixel object for storing values.
             ArrayList<PixelObject> pixelArray = new ArrayList<PixelObject>(); //ArrayList for storing Pixels
+            int backgroundColor = bmp.getPixel(0,0); //Set the background color to be the first pixel for analysis.
+            result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+            ImageView modifiedImageView = (ImageView) findViewById(R.id.resultView);
+            PixelObject bgPixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y));
 
             //Analyze pixel by pixel
             while (y < height) { //Change height value when testing to something more reasonable, so that we don't run out of memory.
                 while (x < width) {
-                    pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y))); //Create new pixel object using values.
-                    pixelArray.add(pixel); //Add to pixel Array
+                   pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
+
+                    if (pixel.getRed() > bgPixel.getRed() - OFFSET && pixel.getRed() < bgPixel.getRed() + OFFSET){
+                        result.setPixel(x,y, Color.BLACK);
+                    }
+                    else if (pixel.getGreen() > bgPixel.getGreen() - OFFSET && pixel.getGreen() < bgPixel.getGreen() + OFFSET){
+                        result.setPixel(x,y, Color.BLACK);
+                    }
+                    else if (pixel.getBlue() > bgPixel.getBlue() - OFFSET && pixel.getBlue() < bgPixel.getBlue() + OFFSET){
+                        result.setPixel(x,y, Color.BLACK);
+                    }
+                    else{
+                        result.setPixel(x,y, Color.BLUE);
+                    }
+
                     x++;
                 }
                 y++;
                 x = 0;
             }
 
-            analyzePixels(pixelArray); //Analyze the pixels
+            modifiedImageView.setImageBitmap(result); //Set the modifiedImageView to the resulting bitmap.
+            analyzeHead();
 
     }
 
     /**
-     * Analyze pixels
-     * @param pixelArray
+     * Analyze head posture.
+     * @return
      */
-    public void analyzePixels(ArrayList<PixelObject> pixelArray){
+    public int analyzeHead(){
 
-        //Uhhhhhhh so try to analyze the pixels and if they're close enough to a white background, or black background??? make them white or black. Otherwise, keep color or make color opposite idk.
-        //Doing this will allow for easier analysis probably.
-        System.out.println("done");
+        //do stuff
 
+        return 0; //Return an offset maybe of how offset the posture is?
     }
+
 
 }

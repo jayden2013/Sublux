@@ -6,4 +6,11 @@
     android:layout_height="match_parent"
     tools:context="com.sublux.jayden.sublux.results">
 
+    <ImageView
+        android:id="@+id/resultView"
+        android:layout_width="wrap_content"
+        android:layout_height="wrap_content"
+        app:srcCompat="@drawable/ic_launcher_background"
+        tools:layout_editor_absoluteX="151dp"
+        tools:layout_editor_absoluteY="247dp" />
 </android.support.constraint.ConstraintLayout>

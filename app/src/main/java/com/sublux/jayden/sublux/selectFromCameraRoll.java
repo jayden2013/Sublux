@@ -52,6 +52,7 @@ public class selectFromCameraRoll extends AppCompatActivity {
     private void displayResults(){
         Intent results = new Intent(selectFromCameraRoll.this, results.class);
         results.putExtra("imageURI", imageUri.getEncodedPath()); //Put Extra to access on following screen.
+        System.out.println(imageUri.getEncodedPath());
         startActivity(results);
     }
 
