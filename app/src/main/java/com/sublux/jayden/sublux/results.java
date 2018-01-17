@@ -77,9 +77,53 @@ public class results extends AppCompatActivity {
                 x = 0; //New row, reset column position.
             }
 
-            modifiedImageView.setImageBitmap(result); //Set the modifiedImageView to the resulting bitmap.
+      //      modifiedImageView.setImageBitmap(result); //Set the modifiedImageView to the resulting bitmap.
+            modifiedImageView.setImageBitmap(cleanUp(result));
+            System.out.println("displaying results");
+
+
             analyzeHead();
 
+    }
+
+    /**
+     * Cleans up a bitmap, thinning out lines and shadows.
+     * @param bmp
+     * @return
+     */
+    public Bitmap cleanUp(Bitmap bmp){
+        Bitmap cleaned = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        PixelObject pixel, nextPixel;
+        boolean firstFound = false;
+        int x = 0, y = 0;
+        System.out.println("cleaning up");
+        while(y < height){
+            while (x < width){
+                pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
+                if (x < width - 1) {
+                    nextPixel = new PixelObject(Color.red(bmp.getPixel(x + 1, y)), Color.green(bmp.getPixel(x + 1, y)), Color.blue(bmp.getPixel(x + 1, y)), bmp.getPixel(x + 1, y)); //Create new pixel object using values.
+                }
+                else{
+                    nextPixel = pixel;
+                }
+                if (pixel.getBlue() != 255 && !firstFound){ //If the pixel is black and it's the first one found...
+                    cleaned.setPixel(x, y, Color.BLACK);
+                    firstFound = true;
+                }
+                else if (pixel.getBlue() != 255 && nextPixel.getBlue() == 255){ //If the pixel is black and the next pixel is blue...
+                    cleaned.setPixel(x, y, Color.BLACK);
+                }
+                else{ //could remove this portion for more speed maybe.
+                    cleaned.setPixel(x, y, Color.WHITE);
+                }
+                x++;
+            }
+            y++;
+            x = 0;
+            firstFound = false;
+        }
+
+        return cleaned;
     }
 
     /**
@@ -101,6 +145,5 @@ public class results extends AppCompatActivity {
         Toast resultToast = Toast.makeText(this, "oh noes bad posture", Toast.LENGTH_LONG);
         resultToast.show(); //Show Bubble Text
     }
-
 
 }
