@@ -45,6 +45,7 @@ public class results extends AppCompatActivity {
             final int OFFSET = 45; //Offset for RGB Threshold.
             width = bmp.getWidth(); //Set Width
             height = bmp.getWidth(); //Set Height
+          //  height = 300; //For Testing
             int x = 0, y = 0; //Initialize X + Y
             int totalPixels = width * height; //Calculate Total Pixel
             PixelObject pixel; //Pixel object for storing values.
@@ -78,11 +79,13 @@ public class results extends AppCompatActivity {
             }
 
       //      modifiedImageView.setImageBitmap(result); //Set the modifiedImageView to the resulting bitmap.
-            modifiedImageView.setImageBitmap(cleanUp(result));
+            result = cleanUp(result);
+            modifiedImageView.setImageBitmap(result);
             System.out.println("displaying results");
 
-
-            analyzeHead();
+            result = analyzeHead(result);
+            System.out.println("analyzed head");
+            modifiedImageView.setImageBitmap(result);
 
     }
 
@@ -114,7 +117,7 @@ public class results extends AppCompatActivity {
                     cleaned.setPixel(x, y, Color.BLACK);
                 }
                 else{ //could remove this portion for more speed maybe.
-                    cleaned.setPixel(x, y, Color.WHITE);
+                    cleaned.setPixel(x, y, Color.BLUE);
                 }
                 x++;
             }
@@ -130,11 +133,103 @@ public class results extends AppCompatActivity {
      * Analyze head posture.
      * @return
      */
-    public int analyzeHead(){
+    public Bitmap analyzeHead(Bitmap bmp){
+        Bitmap headed = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        PixelObject pixel, nextPixel;
+        boolean topHeadFound = false;
+        int x = 0, y = 0;
+        pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
+        int topHeadX = 0, topHeadY = 0, centerMassX = 0;
 
-        //do stuff
 
-        return 0; //Return an offset maybe of how offset the posture is?
+        //Determine the coordinates of the top of the head. Also the center mass X coordinate.
+        while (y < height){
+            while (x < width){
+                pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
+                if (pixel.getBlue() != 255 && topHeadFound == false && y > 40 && x > width / 4) { //If the color is black, the top of the head hasn't been found yet, y is greater than 40 pixels, and x is greater than a quarter of the width...
+                    topHeadFound = true;
+                    topHeadX = x; //Get topHeadX value for analysis.
+                    topHeadY = y; //Get topHeadY value for analysis.
+
+                    while(x < width) { //This is all for testing.
+                        headed.setPixel(x, y, Color.RED);
+                        x++;
+                    }
+                }
+                else if (pixel.getBlue() == 255){
+                    headed.setPixel(x, y, Color.BLUE);
+                }
+                else{
+                    headed.setPixel(x, y, Color.BLACK);
+                }
+
+                x++;
+            }
+            y++;
+            x = 0;
+        }
+        centerMassX = topHeadX; //The center mass X coordinate and the top head X coordinate are the same. Using different variables for easier understanding.
+
+        //Determine foot coordinate.
+
+        y = height - 1;
+        x = 0;
+
+        boolean bottomYFound = false;
+        int bottomY = 0;
+        while (y > 0){
+            while (x < width){
+                pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
+                if (pixel.getBlue() != 255 && bottomYFound == false) { //If the color is black, the top of the head hasn't been found yet, y is greater than 40 pixels, and x is greater than a quarter of the width...
+                    bottomYFound = true;
+                    bottomY = y;
+                    System.out.println("Y coordinate:" + y);
+                    while(x < width) { //This is all for testing.
+                        headed.setPixel(x, y, Color.RED);
+                        x++;
+                    }
+                }
+                x++;
+            }
+            y--;
+            x = 0;
+        }
+
+
+        //Determine center mass Y
+        int centerMassY = (bottomY - topHeadY) /2;
+        //This is all for testing:
+//        System.out.println("CENTER MASS Y : " + centerMassY);
+//        x = 0;
+//        while (x < width){
+//            headed.setPixel(x, centerMassY, Color.RED);
+//            x++;
+//        }
+
+        //Find chin
+        y = centerMassY;
+        int bottomHeadY = 0;
+        while (y > topHeadY){
+            pixel = new PixelObject(Color.red(bmp.getPixel(centerMassX,y)), Color.green(bmp.getPixel(centerMassX,y)), Color.blue(bmp.getPixel(centerMassX,y)), bmp.getPixel(centerMassX,y)); //Create new pixel object using values.
+            if (pixel.getBlue() != 255){
+                bottomHeadY = y;
+                //For Testing
+//                System.out.println("Found Chin: " + y);
+//                x = 0;
+//                while (x < width){
+//                headed.setPixel(x, bottomHeadY, Color.RED);
+//                x++;
+//                }
+                break;
+            }
+            y--;
+        }
+
+
+
+
+
+        return headed; //Return an offset maybe of how offset the posture is?
     }
 
     /**
