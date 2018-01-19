@@ -41,53 +41,48 @@ public class results extends AppCompatActivity {
         if (permissionCheck != 0) { //If we don't have permissions, request permissions
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
         }
-            //Access file
-            Bitmap bmp = BitmapFactory.decodeFile(imagePath); //This is the image to be analyzed, now dynamic.
-            final int OFFSET = 50; //Offset for RGB Threshold.
-            width = bmp.getWidth(); //Set Width
-            height = bmp.getWidth(); //Set Height
-          //  height = 300; //For Testing
-            int x = 0, y = 0; //Initialize X + Y
-            int totalPixels = width * height; //Calculate Total Pixel
-            PixelObject pixel; //Pixel object for storing values.
-            ArrayList<PixelObject> pixelArray = new ArrayList<PixelObject>(); //ArrayList for storing Pixels
-            int backgroundColor = bmp.getPixel(0,0); //Set the background color to be the first pixel for analysis.
-            result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-            ImageView modifiedImageView = (ImageView) findViewById(R.id.resultView);
-            PixelObject bgPixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y));
+        //Access file
+        Bitmap bmp = BitmapFactory.decodeFile(imagePath); //This is the image to be analyzed, now dynamic.
+        final int OFFSET = 45; //Offset for RGB Threshold. 50 doesn't seem to work for ears, but 45 does. 40 crashes.
+        width = bmp.getWidth(); //Set Width
+        height = bmp.getWidth(); //Set Height
+        //  height = 300; //For Testing
+        int x = 0, y = 0; //Initialize X + Y
+        int totalPixels = width * height; //Calculate Total Pixel
+        PixelObject pixel; //Pixel object for storing values.
+        ArrayList<PixelObject> pixelArray = new ArrayList<PixelObject>(); //ArrayList for storing Pixels
+        int backgroundColor = bmp.getPixel(0,0); //Set the background color to be the first pixel for analysis.
+        result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+        ImageView modifiedImageView = (ImageView) findViewById(R.id.resultView);
+        PixelObject bgPixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y));
 
-            //Analyze pixel by pixel
-            while (y < height) { //Change height value when testing to something more reasonable, so that we don't run out of memory.
-                while (x < width) {
-                   pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
+        //Analyze pixel by pixel
+        while (y < height) { //Change height value when testing to something more reasonable, so that we don't run out of memory.
+            while (x < width) {
+                pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
 
-                    if (pixel.getRed() > bgPixel.getRed() - OFFSET && pixel.getRed() < bgPixel.getRed() + OFFSET){
-                        result.setPixel(x,y, Color.BLACK);
-                    }
-                    else if (pixel.getGreen() > bgPixel.getGreen() - OFFSET && pixel.getGreen() < bgPixel.getGreen() + OFFSET){
-                        result.setPixel(x,y, Color.BLACK);
-                    }
-                    else if (pixel.getBlue() > bgPixel.getBlue() - OFFSET && pixel.getBlue() < bgPixel.getBlue() + OFFSET){
-                        result.setPixel(x,y, Color.BLACK);
-                    }
-                    else{
-                        result.setPixel(x,y, Color.BLUE);
-                    }
-                    x++; //Increment column position.
+                if (pixel.getRed() > bgPixel.getRed() - OFFSET && pixel.getRed() < bgPixel.getRed() + OFFSET){
+                    result.setPixel(x,y, Color.BLACK);
                 }
-                y++; //Increment row position.
-                x = 0; //New row, reset column position.
+                else if (pixel.getGreen() > bgPixel.getGreen() - OFFSET && pixel.getGreen() < bgPixel.getGreen() + OFFSET){
+                    result.setPixel(x,y, Color.BLACK);
+                }
+                else if (pixel.getBlue() > bgPixel.getBlue() - OFFSET && pixel.getBlue() < bgPixel.getBlue() + OFFSET){
+                    result.setPixel(x,y, Color.BLACK);
+                }
+                else{
+                    result.setPixel(x,y, Color.BLUE);
+                }
+                x++; //Increment column position.
             }
+            y++; //Increment row position.
+            x = 0; //New row, reset column position.
+        }
 
-//            modifiedImageView.setImageBitmap(result); //Set the modifiedImageView to the resulting bitmap.
-            result = cleanUp(result);
-            modifiedImageView.setImageBitmap(result);
-            System.out.println("displaying results");
-
-            result = analyzeHead(result);
-            System.out.println("analyzed head");
-            modifiedImageView.setImageBitmap(result);
-
+        result = cleanUp(result);
+        result = analyzeHead(result);
+        System.out.println("analyzed head");
+        modifiedImageView.setImageBitmap(result);
     }
 
     /**
@@ -144,7 +139,7 @@ public class results extends AppCompatActivity {
         final int SHOULDER_THRESHOLD = 5; //The acceptable threshold for shoulder comparisons. Anything outside of this will be considered bad posture.
         int shoulder_posture_value = 0;
         boolean leftShoulderHigher = false;
-
+        int SHOULDER_TO_EAR_THRESHOLD = 15; //The acceptable threshold for shoulder to ear comparisons. Anything outside of this will be considered bad posture. Checks for tilted heads.
 
         //Determine the coordinates of the top of the head. Also the center mass X coordinate.
         while (y < height){
@@ -199,7 +194,6 @@ public class results extends AppCompatActivity {
             x = 0;
         }
 
-
         //Determine center mass Y
         int centerMassY = (bottomY - topHeadY) /2;
         //This is all for testing:
@@ -221,8 +215,8 @@ public class results extends AppCompatActivity {
                 System.out.println("Found Chin: " + y);
                 x = 0;
                 while (x < width){
-                headed.setPixel(x, bottomHeadY, Color.RED);
-                x++;
+                    headed.setPixel(x, bottomHeadY, Color.RED);
+                    x++;
                 }
                 break;
             }
@@ -263,9 +257,6 @@ public class results extends AppCompatActivity {
         leftShoulderPoint.set(x, y);
         headed.setPixel(leftShoulderPoint.x, leftShoulderPoint.y, Color.GREEN);
 
-
-
-
         //Find the right shoulder
         x = centerMassX / 4;
         x = centerMassX + x;
@@ -287,8 +278,6 @@ public class results extends AppCompatActivity {
         rightShoulderPoint.set(x, y);
 
         headed.setPixel(rightShoulderPoint.x, rightShoulderPoint.y, Color.GREEN);
-
-
 
         //Prepare Shoulder Toast.
         Toast shoulderToast = Toast.makeText(this, "No posture information available.", Toast.LENGTH_LONG);
@@ -315,6 +304,73 @@ public class results extends AppCompatActivity {
         //Display the toast to display the results to the user. TEMPORARY.
         shoulderToast.show();
 
+        //Analyze head for tilt.
+        //Get distance between shoulder points.
+        int shoulderDistance = rightShoulderPoint.x - leftShoulderPoint.x;
+
+        //Get ear Y
+        int midHeadY = bottomHeadY - topHeadY;
+
+        //Get Right Ear
+        x = centerMassX;
+        y = midHeadY;
+        while (x < width) {
+            pixel = new PixelObject(Color.red(bmp.getPixel(x, y)), Color.green(bmp.getPixel(x, y)), Color.blue(bmp.getPixel(x, y)), bmp.getPixel(x, y)); //Create new pixel object using values.
+            if (pixel.getBlue() != 255){ //If pixel color is black.
+                break;
+            }
+            x++;
+            if (x == width){
+                x = 0;
+                y -= 1;
+            }
+        }
+        Point rightEarPoint = new Point();
+        rightEarPoint.set(x,y);
+
+        //Get Left Ear
+        x = leftShoulderPoint.x;
+        y = midHeadY;
+        while (x < centerMassX) {
+            pixel = new PixelObject(Color.red(bmp.getPixel(x, y)), Color.green(bmp.getPixel(x, y)), Color.blue(bmp.getPixel(x, y)), bmp.getPixel(x, y)); //Create new pixel object using values.
+            if (pixel.getBlue() != 255){ //If pixel color is black.
+                break;
+            }
+            x++;
+            if (x == centerMassX){
+                x = leftShoulderPoint.x;
+                y -= 1;
+            }
+        }
+
+        Point leftEarPoint = new Point();
+        leftEarPoint.set(x,y);
+
+        headed.setPixel(rightEarPoint.x, rightEarPoint.y, Color.GREEN);
+        headed.setPixel(leftEarPoint.x, leftEarPoint.y, Color.GREEN);
+
+        //Check for tilted head.
+        int leftShoulderToEar = leftEarPoint.x - leftShoulderPoint.x;
+        int rightShoulderToEar = rightShoulderPoint.x - rightEarPoint.x;
+        boolean head_tilted_left = false;
+        String headTiltText = "No Posture Information Available.";
+        if (Math.abs(leftShoulderToEar - rightShoulderToEar) > SHOULDER_TO_EAR_THRESHOLD){
+            head_tilted_left = leftShoulderToEar < rightShoulderToEar;
+            headTiltText = "Head tilt is outside the range of acceptable values. ";
+            if (head_tilted_left) {
+                headTiltText += "Your head is tilted to the left.";
+            }
+            else{
+                headTiltText += "Your head is tilted to the right.";
+            }
+        }
+        else{
+            headTiltText = "Your head tilt is within the range of acceptable values. ";
+        }
+
+        //Display tilt results.
+        Toast tiltedToast = Toast.makeText(this, headTiltText, Toast.LENGTH_LONG);
+        tiltedToast.show();
 
         return headed; //Return an offset maybe of how offset the posture is?
     }
