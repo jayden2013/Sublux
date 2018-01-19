@@ -197,12 +197,12 @@ public class results extends AppCompatActivity {
         //Determine center mass Y
         int centerMassY = (bottomY - topHeadY) /2;
         //This is all for testing:
-        System.out.println("CENTER MASS Y : " + centerMassY);
-        x = 0;
-        while (x < width){
-            headed.setPixel(x, centerMassY, Color.RED);
-            x++;
-        }
+//        System.out.println("CENTER MASS Y : " + centerMassY);
+//        x = 0;
+//        while (x < width){
+//            headed.setPixel(x, centerMassY, Color.RED);
+//            x++;
+//        }
 
         //Find chin
         y = centerMassY;
@@ -371,6 +371,65 @@ public class results extends AppCompatActivity {
         //Display tilt results.
         Toast tiltedToast = Toast.makeText(this, headTiltText, Toast.LENGTH_LONG);
         tiltedToast.show();
+
+        //Analyze Waist.
+
+        //Left Hip
+        y = centerMassY;
+        //Set x to x/4 of centerMassX. Can't do it in one operation for some reason.
+        x = centerMassX / 4;
+        x = centerMassX - x;
+
+        while(x < centerMassX){
+            pixel = new PixelObject(Color.red(bmp.getPixel(x, y)), Color.green(bmp.getPixel(x, y)), Color.blue(bmp.getPixel(x, y)), bmp.getPixel(x, y)); //Create new pixel object using values.
+
+            if (pixel.getBlue() != 255){ //If the pixel is black.
+                break;
+            }
+
+            if (x == 0){
+                //Set x to x/4 of centerMassX. Can't do it in one operation for some reason.
+                x = centerMassX / 4;
+                x = centerMassX - x;
+                y++; //Try again at new Y coordinate.
+            }
+            x++;
+        }
+        Point leftHipPoint = new Point();
+        leftHipPoint.set(x,y);
+
+        //Testing.
+        headed.setPixel(leftHipPoint.x, leftHipPoint.y, Color.YELLOW);
+
+        //Right hip
+        y = centerMassY;
+        x = centerMassX / 4;
+        x = centerMassX + x;
+
+        while (x > centerMassX){
+            pixel = new PixelObject(Color.red(bmp.getPixel(x, y)), Color.green(bmp.getPixel(x, y)), Color.blue(bmp.getPixel(x, y)), bmp.getPixel(x, y)); //Create new pixel object using values.
+
+            if (pixel.getBlue() != 255){ //If pixel is black.
+                break;
+            }
+
+            if (x == 0){
+                x = centerMassX / 4;
+                x = centerMassX + x;
+                y++;
+            }
+            x--;
+        }
+
+        Point rightHipPoint = new Point();
+        rightHipPoint.set(x,y);
+
+        //Testing
+        headed.setPixel(rightHipPoint.x, rightHipPoint.y, Color.YELLOW);
+
+        //Check Hip Values
+
+
 
         return headed; //Return an offset maybe of how offset the posture is?
     }
