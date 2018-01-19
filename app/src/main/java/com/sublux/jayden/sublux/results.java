@@ -5,6 +5,7 @@ import android.content.Intent;
 import android.graphics.Bitmap;
 import android.graphics.BitmapFactory;
 import android.graphics.Color;
+import android.graphics.Point;
 import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
@@ -42,7 +43,7 @@ public class results extends AppCompatActivity {
         }
             //Access file
             Bitmap bmp = BitmapFactory.decodeFile(imagePath); //This is the image to be analyzed, now dynamic.
-            final int OFFSET = 45; //Offset for RGB Threshold.
+            final int OFFSET = 50; //Offset for RGB Threshold.
             width = bmp.getWidth(); //Set Width
             height = bmp.getWidth(); //Set Height
           //  height = 300; //For Testing
@@ -78,7 +79,7 @@ public class results extends AppCompatActivity {
                 x = 0; //New row, reset column position.
             }
 
-      //      modifiedImageView.setImageBitmap(result); //Set the modifiedImageView to the resulting bitmap.
+//            modifiedImageView.setImageBitmap(result); //Set the modifiedImageView to the resulting bitmap.
             result = cleanUp(result);
             modifiedImageView.setImageBitmap(result);
             System.out.println("displaying results");
@@ -140,6 +141,9 @@ public class results extends AppCompatActivity {
         int x = 0, y = 0;
         pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
         int topHeadX = 0, topHeadY = 0, centerMassX = 0;
+        final int SHOULDER_THRESHOLD = 5; //The acceptable threshold for shoulder comparisons. Anything outside of this will be considered bad posture.
+        int shoulder_posture_value = 0;
+        boolean leftShoulderHigher = false;
 
 
         //Determine the coordinates of the top of the head. Also the center mass X coordinate.
@@ -199,12 +203,12 @@ public class results extends AppCompatActivity {
         //Determine center mass Y
         int centerMassY = (bottomY - topHeadY) /2;
         //This is all for testing:
-//        System.out.println("CENTER MASS Y : " + centerMassY);
-//        x = 0;
-//        while (x < width){
-//            headed.setPixel(x, centerMassY, Color.RED);
-//            x++;
-//        }
+        System.out.println("CENTER MASS Y : " + centerMassY);
+        x = 0;
+        while (x < width){
+            headed.setPixel(x, centerMassY, Color.RED);
+            x++;
+        }
 
         //Find chin
         y = centerMassY;
@@ -214,19 +218,102 @@ public class results extends AppCompatActivity {
             if (pixel.getBlue() != 255){
                 bottomHeadY = y;
                 //For Testing
-//                System.out.println("Found Chin: " + y);
-//                x = 0;
-//                while (x < width){
-//                headed.setPixel(x, bottomHeadY, Color.RED);
-//                x++;
-//                }
+                System.out.println("Found Chin: " + y);
+                x = 0;
+                while (x < width){
+                headed.setPixel(x, bottomHeadY, Color.RED);
+                x++;
+                }
                 break;
             }
             y--;
         }
 
+        //Analyze Left Shoulder
+        int shoulderLine = 0;
+        shoulderLine = centerMassY - bottomHeadY;
+        System.out.println("left shoulder: " + shoulderLine);
+        x = 0;
+        while (x < width){
+            headed.setPixel(x, shoulderLine, Color.WHITE);
+            x++;
+        }
+
+        int shoulderWhereAbouts = bottomHeadY - shoulderLine;
+
+        y = bottomHeadY;
+        //Set x to x/4 of centerMassX. Can't do it in one operation for some reason.
+        x = centerMassX / 4;
+        x = centerMassX - x;
+
+        Point leftShoulderPoint = new Point();
+        while(y < shoulderLine){
+            pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
+            if (pixel.getBlue() != 255){ //If pixel is black
+                System.out.println("Found the shoulder." + y);
+                break;
+            }
+            y++;
+            if (y == shoulderLine){ //If we made it to the shoulder line without finding a suspected shoulder, restart with x - 1;
+                y = bottomHeadY;
+                x -= 1;
+            }
+        }
+
+        leftShoulderPoint.set(x, y);
+        headed.setPixel(leftShoulderPoint.x, leftShoulderPoint.y, Color.GREEN);
 
 
+
+
+        //Find the right shoulder
+        x = centerMassX / 4;
+        x = centerMassX + x;
+
+        Point rightShoulderPoint = new Point();
+        while(y < shoulderLine){
+            pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
+            if (pixel.getBlue() != 255){ //If pixel is black
+                System.out.println("Found the shoulder." + y);
+                break;
+            }
+            y++;
+            if (y == shoulderLine){
+                y = bottomHeadY;
+                x += 1;
+            }
+        }
+
+        rightShoulderPoint.set(x, y);
+
+        headed.setPixel(rightShoulderPoint.x, rightShoulderPoint.y, Color.GREEN);
+
+
+
+        //Prepare Shoulder Toast.
+        Toast shoulderToast = Toast.makeText(this, "No posture information available.", Toast.LENGTH_LONG);
+        String shoulderResultText = "No posture information available.";
+        //Get shoulder posture value.
+        shoulder_posture_value = Math.abs(leftShoulderPoint.y - rightShoulderPoint.y);
+        //Check shoulder posture value against shoulder threshold.
+        if (shoulder_posture_value > SHOULDER_THRESHOLD){
+            leftShoulderHigher = leftShoulderPoint.y > rightShoulderPoint.y;
+            shoulderResultText = "Shoulder posture is outside the range of acceptable values. ";
+            if (leftShoulderHigher) {
+                shoulderResultText += "Your left shoulder is higher than your right shoulder.";
+            }
+            else{
+                shoulderResultText += "Your left shoulder is lower than your right shoulder.";
+            }
+        }
+        else{
+            shoulderResultText = "Shoulder posture is within the range of acceptable values. ";
+        }
+
+        //Set toast text.
+        shoulderToast.setText(shoulderResultText);
+        //Display the toast to display the results to the user. TEMPORARY.
+        shoulderToast.show();
 
 
         return headed; //Return an offset maybe of how offset the posture is?
