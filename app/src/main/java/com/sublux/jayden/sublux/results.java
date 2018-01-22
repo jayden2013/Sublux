@@ -11,7 +11,7 @@ import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
 import android.widget.ImageView;
-import android.widget.Toast;
+import android.widget.TextView;
 
 import java.util.ArrayList;
 
@@ -20,6 +20,7 @@ public class results extends AppCompatActivity {
     String imagePath = "";
     int width = 0, height = 0;
     Bitmap result;
+    StringBuilder resultsString = new StringBuilder();
 
     @Override
     protected void onCreate(Bundle savedInstanceState) {
@@ -28,6 +29,7 @@ public class results extends AppCompatActivity {
         Intent i = getIntent();
         this.imagePath = i.getStringExtra("imagePath"); //Set Image Path
         analyzeImage();
+        displayResults();
     }
 
     /**
@@ -53,7 +55,6 @@ public class results extends AppCompatActivity {
         ArrayList<PixelObject> pixelArray = new ArrayList<PixelObject>(); //ArrayList for storing Pixels
         int backgroundColor = bmp.getPixel(0,0); //Set the background color to be the first pixel for analysis.
         result = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
-        ImageView modifiedImageView = (ImageView) findViewById(R.id.resultView);
         PixelObject bgPixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y));
 
         //Analyze pixel by pixel
@@ -81,8 +82,7 @@ public class results extends AppCompatActivity {
 
         result = cleanUp(result);
         result = analyzeHead(result);
-        System.out.println("analyzed head");
-        modifiedImageView.setImageBitmap(result);
+
     }
 
     /**
@@ -136,10 +136,11 @@ public class results extends AppCompatActivity {
         int x = 0, y = 0;
         pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
         int topHeadX = 0, topHeadY = 0, centerMassX = 0;
-        final int SHOULDER_THRESHOLD = 5; //The acceptable threshold for shoulder comparisons. Anything outside of this will be considered bad posture.
+        final int SHOULDER_THRESHOLD = 10; //The acceptable threshold for shoulder comparisons. Anything outside of this will be considered bad posture.
         int shoulder_posture_value = 0;
         boolean leftShoulderHigher = false;
         int SHOULDER_TO_EAR_THRESHOLD = 15; //The acceptable threshold for shoulder to ear comparisons. Anything outside of this will be considered bad posture. Checks for tilted heads.
+        int HIP_WIDTH_THRESHOLD = 25; //The acceptable threshold for centered hip comparisons.
 
         //Determine the coordinates of the top of the head. Also the center mass X coordinate.
         while (y < height){
@@ -197,12 +198,12 @@ public class results extends AppCompatActivity {
         //Determine center mass Y
         int centerMassY = (bottomY - topHeadY) /2;
         //This is all for testing:
-//        System.out.println("CENTER MASS Y : " + centerMassY);
-//        x = 0;
-//        while (x < width){
-//            headed.setPixel(x, centerMassY, Color.RED);
-//            x++;
-//        }
+        System.out.println("CENTER MASS Y : " + centerMassY);
+        x = 0;
+        while (x < width){
+            headed.setPixel(x, centerMassY, Color.RED);
+            x++;
+        }
 
         //Find chin
         y = centerMassY;
@@ -279,30 +280,26 @@ public class results extends AppCompatActivity {
 
         headed.setPixel(rightShoulderPoint.x, rightShoulderPoint.y, Color.GREEN);
 
-        //Prepare Shoulder Toast.
-        Toast shoulderToast = Toast.makeText(this, "No posture information available.", Toast.LENGTH_LONG);
         String shoulderResultText = "No posture information available.";
         //Get shoulder posture value.
         shoulder_posture_value = Math.abs(leftShoulderPoint.y - rightShoulderPoint.y);
+        System.out.println(shoulder_posture_value);
         //Check shoulder posture value against shoulder threshold.
         if (shoulder_posture_value > SHOULDER_THRESHOLD){
             leftShoulderHigher = leftShoulderPoint.y > rightShoulderPoint.y;
             shoulderResultText = "Shoulder posture is outside the range of acceptable values. ";
             if (leftShoulderHigher) {
-                shoulderResultText += "Your left shoulder is higher than your right shoulder.";
+                shoulderResultText += "Your left shoulder is higher than your right shoulder.\n";
             }
             else{
-                shoulderResultText += "Your left shoulder is lower than your right shoulder.";
+                shoulderResultText += "Your left shoulder is lower than your right shoulder.\n";
             }
         }
         else{
-            shoulderResultText = "Shoulder posture is within the range of acceptable values. ";
+            shoulderResultText = "Your shoulder posture is looking great!\n";
         }
 
-        //Set toast text.
-        shoulderToast.setText(shoulderResultText);
-        //Display the toast to display the results to the user. TEMPORARY.
-        shoulderToast.show();
+        resultsString.append(shoulderResultText);
 
         //Analyze head for tilt.
         //Get distance between shoulder points.
@@ -358,19 +355,16 @@ public class results extends AppCompatActivity {
             head_tilted_left = leftShoulderToEar < rightShoulderToEar;
             headTiltText = "Head tilt is outside the range of acceptable values. ";
             if (head_tilted_left) {
-                headTiltText += "Your head is tilted to the left.";
+                headTiltText += "Your head is tilted to the left.\n";
             }
             else{
-                headTiltText += "Your head is tilted to the right.";
+                headTiltText += "Your head is tilted to the right.\n";
             }
         }
         else{
-            headTiltText = "Your head tilt is within the range of acceptable values. ";
+            headTiltText = "Your head and neck are looking excellent!\n";
         }
-
-        //Display tilt results.
-        Toast tiltedToast = Toast.makeText(this, headTiltText, Toast.LENGTH_LONG);
-        tiltedToast.show();
+        resultsString.append(headTiltText);
 
         //Analyze Waist.
 
@@ -427,9 +421,15 @@ public class results extends AppCompatActivity {
         //Testing
         headed.setPixel(rightHipPoint.x, rightHipPoint.y, Color.YELLOW);
 
+        String hipText;
         //Check Hip Values
-
-
+        if (Math.abs((rightHipPoint.x - centerMassX) - (centerMassX - leftHipPoint.x)) > HIP_WIDTH_THRESHOLD){
+            hipText = "Hip values are outside of threshold.\n";
+        }
+        else{
+            hipText = "Your hip posture is looking excellent!\n";
+        }
+        resultsString.append(hipText);
 
         return headed; //Return an offset maybe of how offset the posture is?
     }
@@ -438,9 +438,10 @@ public class results extends AppCompatActivity {
      * Displays the results of the image analysis with a toast.
      */
     public void displayResults(){
-        //Temporary toast until full image analysis is complete.
-        Toast resultToast = Toast.makeText(this, "oh noes bad posture", Toast.LENGTH_LONG);
-        resultToast.show(); //Show Bubble Text
+        ImageView modifiedImageView = (ImageView) findViewById(R.id.resultView);
+        modifiedImageView.setImageBitmap(result);
+        TextView resultsView = (TextView) findViewById(R.id.resultsView);
+        resultsView.setText(resultsString.toString());
     }
 
 }
