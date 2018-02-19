@@ -48,6 +48,7 @@ public class results extends AppCompatActivity {
         final int OFFSET = 45; //Offset for RGB Threshold. 50 doesn't seem to work for ears, but 45 does. 40 crashes.
         width = bmp.getWidth(); //Set Width
         height = bmp.getWidth(); //Set Height
+        System.out.println("width: " + width + " height: " + height);
         //  height = 300; //For Testing
         int x = 0, y = 0; //Initialize X + Y
         int totalPixels = width * height; //Calculate Total Pixel
@@ -317,6 +318,7 @@ public class results extends AppCompatActivity {
                 break;
             }
             x++;
+            System.out.println(x);
             if (x == width){
                 x = 0;
                 y -= 1;

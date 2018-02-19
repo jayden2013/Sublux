@@ -3,11 +3,14 @@ package com.sublux.jayden.sublux;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.icu.text.DateFormat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+
+import java.util.Date;
 
 public class home extends AppCompatActivity {
 
@@ -47,5 +50,18 @@ public class home extends AppCompatActivity {
                 }
             }
         });
+
+        //Checking the date for fun. Maybe to change the app theme based on the date/time.
+        String date = DateFormat.getDateInstance(DateFormat.SHORT).format(new Date()).substring(0,5);
+        if (date.equals("1/1/1")){ //Check is weird, due to the way the string is substring'd. We'll still cash it tho.
+            System.out.println("HAPPY NEW YEAR");
+        } else if (date.equals("7/4/1")){
+            System.out.println("HAPPY INDEPENDENCE DAY!");
+        } else if (date.equals("10/31")) {
+                System.out.println("SPOOKY");
+        }
+        else{
+            System.out.println("NO HOLIDAYS :(");
+        }
     }
 }
