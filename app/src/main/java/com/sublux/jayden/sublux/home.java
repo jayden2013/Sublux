@@ -46,9 +46,13 @@ public class home extends AppCompatActivity {
                 home.super.onActivityResult(requestCode, resultCode, data);
                 if(requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK){
                     Bitmap photo = (Bitmap) data.getExtras().get("data");
+                    System.out.println(photo.getHeight());
                     cameraView.setImageBitmap(photo);
                 }
+
             }
+
+
         });
 
         //Checking the date for fun. Maybe to change the app theme based on the date/time.
