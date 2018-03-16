@@ -82,7 +82,9 @@ public class results extends AppCompatActivity {
         }
 
         result = cleanUp(result);
+        System.out.println("CLEAN UP HEIGHT / WIDTH: " + result.getHeight() + ", " + result.getWidth());
         result = analyzeHead(result);
+        System.out.println("ANALYZED HEIGHT / WIDTH: " + result.getHeight() + ", " + result.getWidth());
 
     }
 
@@ -437,10 +439,10 @@ public class results extends AppCompatActivity {
     }
 
     /**
-     * Displays the results of the image analysis with a toast.
+     * Displays the results of the image analysis.
      */
     public void displayResults(){
-        ImageView modifiedImageView = (ImageView) findViewById(R.id.resultView);
+        final ImageView modifiedImageView = (ImageView) findViewById(R.id.resultView);
         modifiedImageView.setImageBitmap(result);
         TextView resultsView = (TextView) findViewById(R.id.resultsView);
         resultsView.setText(resultsString.toString());

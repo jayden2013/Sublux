@@ -11,21 +11,21 @@
     <Button
         android:id="@+id/imageSelectButton"
         android:layout_width="wrap_content"
-        android:layout_height="wrap_content"
+        android:layout_height="47dp"
         android:layout_marginStart="52dp"
-        android:text="Browse"
         android:background="#F47D4A"
+        android:text="Browse"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintStart_toStartOf="@+id/imageView"
         app:layout_constraintTop_toTopOf="parent"
-        app:layout_constraintVertical_bias="0.499" />
+        app:layout_constraintVertical_bias="0.573" />
 
     <ImageView
         android:id="@+id/imageView"
         android:layout_width="188dp"
         android:layout_height="177dp"
         android:layout_marginStart="108dp"
-        android:layout_marginTop="16dp"
+        android:layout_marginTop="152dp"
         app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:srcCompat="@android:color/transparent" />
@@ -39,4 +39,20 @@
         android:text="Analyze"
         app:layout_constraintStart_toStartOf="@+id/imageSelectButton"
         app:layout_constraintTop_toBottomOf="@+id/imageSelectButton" />
+
+    <TextView
+        android:id="@+id/instructionText"
+        android:layout_width="258dp"
+        android:layout_height="93dp"
+        android:layout_marginBottom="8dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
+        android:layout_marginTop="8dp"
+        android:text="Select an image, then tap analyze"
+        android:textColor="#FFEC5C"
+        android:textSize="35sp"
+        app:layout_constraintBottom_toTopOf="@+id/imageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
+        app:layout_constraintTop_toTopOf="parent" />
 </android.support.constraint.ConstraintLayout>

@@ -2,6 +2,7 @@ package com.sublux.jayden.sublux;
 
 import android.content.Intent;
 import android.database.Cursor;
+import android.graphics.Color;
 import android.net.Uri;
 import android.os.Bundle;
 import android.provider.MediaStore;
@@ -9,6 +10,7 @@ import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 public class selectFromCameraRoll extends AppCompatActivity {
 
@@ -34,9 +36,22 @@ public class selectFromCameraRoll extends AppCompatActivity {
         analysisButton.setOnClickListener(new View.OnClickListener(){
             @Override
             public void onClick(View view){
-                //do stuff
-                analysisButton.setText("Analyzing...");
-                displayResults();
+                if (imageUri != null){
+                    //do stuff
+                    analysisButton.setText("Analyzing...");
+                    displayResults();
+                } //If there isn't an image selected, then prevent the app from crashing and change the text color to alert the user.
+                else{
+                    TextView txt = (TextView) findViewById(R.id.instructionText);
+                    if (txt.getCurrentTextColor() == Color.parseColor("#E1315B")){
+                        txt.setTextColor(Color.parseColor("#FFEC5C"));
+                    }
+                    else{
+                        txt.setTextColor(Color.parseColor("#E1315B"));
+                    }
+
+                }
+
             }
         });
     }
