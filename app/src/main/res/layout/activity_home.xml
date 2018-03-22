@@ -9,13 +9,14 @@
     tools:layout_editor_absoluteY="81dp">
 
     <TextView
-        android:id="@+id/textView"
-        android:layout_width="83dp"
-        android:layout_height="34dp"
+        android:id="@+id/theCurrentYear"
+        android:layout_width="326dp"
+        android:layout_height="33dp"
         android:layout_marginBottom="8dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:text="Sublux 2018"
+        android:textAlignment="center"
         android:textColor="#FFEC5C"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
@@ -31,7 +32,7 @@
         android:layout_marginTop="8dp"
         android:background="#F47D4A"
         android:text="Camera Roll"
-        app:layout_constraintBottom_toBottomOf="@+id/textView"
+        app:layout_constraintBottom_toBottomOf="@+id/theCurrentYear"
         app:layout_constraintEnd_toEndOf="parent"
         app:layout_constraintHorizontal_bias="0.497"
         app:layout_constraintStart_toStartOf="parent"
@@ -75,7 +76,7 @@
         app:srcCompat="@drawable/logo" />
 
     <TextView
-        android:id="@+id/textView2"
+        android:id="@+id/title"
         android:layout_width="223dp"
         android:layout_height="95dp"
         android:layout_marginBottom="8dp"

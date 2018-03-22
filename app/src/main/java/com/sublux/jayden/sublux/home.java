@@ -3,12 +3,14 @@ package com.sublux.jayden.sublux;
 import android.app.Activity;
 import android.content.Intent;
 import android.graphics.Bitmap;
+import android.graphics.Color;
 import android.icu.text.DateFormat;
 import android.os.Bundle;
 import android.support.v7.app.AppCompatActivity;
 import android.view.View;
 import android.widget.Button;
 import android.widget.ImageView;
+import android.widget.TextView;
 
 import java.util.Date;
 
@@ -22,6 +24,21 @@ public class home extends AppCompatActivity {
         setContentView(R.layout.activity_home);
         Button cameraRollButton = (Button) findViewById(R.id.cameraRollButton);
         Button takePhotoButton = (Button) findViewById(R.id.takePhotoButton);
+        final TextView subluxTitle = (TextView) findViewById(R.id.title);
+
+        //For cool UI effects.
+        subluxTitle.setOnClickListener(new View.OnClickListener() {
+            @Override
+            public void onClick(View view){
+                if (subluxTitle.getCurrentTextColor() == Color.parseColor("#FFEC5C")){
+                    subluxTitle.setTextColor(Color.parseColor("#E1315B"));
+                }
+                else {
+                    subluxTitle.setTextColor(Color.parseColor("#FFEC5C"));
+                }
+
+            }
+        });
 
         cameraRollButton.setOnClickListener(new View.OnClickListener() {
 
@@ -50,21 +67,17 @@ public class home extends AppCompatActivity {
                 }
 
             }
-
-
         });
 
         //Checking the date for fun. Maybe to change the app theme based on the date/time.
         String date = DateFormat.getDateInstance(DateFormat.SHORT).format(new Date()).substring(0,5);
+        final TextView currentYearText = (TextView) findViewById(R.id.theCurrentYear);
         if (date.equals("1/1/1")){ //Check is weird, due to the way the string is substring'd. We'll still cash it tho.
-            System.out.println("HAPPY NEW YEAR");
+            currentYearText.setText("Happy New Year");
         } else if (date.equals("7/4/1")){
-            System.out.println("HAPPY INDEPENDENCE DAY!");
+            currentYearText.setText("Happy Independence Day");
         } else if (date.equals("10/31")) {
-                System.out.println("SPOOKY");
-        }
-        else{
-            System.out.println("NO HOLIDAYS :(");
+            currentYearText.setText("Happy Halloween");
         }
     }
 }

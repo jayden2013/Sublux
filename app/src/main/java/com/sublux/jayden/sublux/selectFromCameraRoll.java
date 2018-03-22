@@ -51,7 +51,6 @@ public class selectFromCameraRoll extends AppCompatActivity {
                     }
 
                 }
-
             }
         });
     }
@@ -116,6 +115,4 @@ public class selectFromCameraRoll extends AppCompatActivity {
         cursor.moveToFirst();
         return cursor.getString(column_index);
     }
-
 }
-

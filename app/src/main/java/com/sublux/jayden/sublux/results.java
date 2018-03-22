@@ -44,7 +44,7 @@ public class results extends AppCompatActivity {
         }
         //Access file
         Bitmap bmp = BitmapFactory.decodeFile(imagePath); //This is the image to be analyzed, now dynamic.
-        final int OFFSET = 45; //Offset for RGB Threshold. 50 doesn't seem to work for ears, but 45 does. 40 crashes.
+        final int OFFSET = 35; //Offset for RGB Threshold. 50 doesn't seem to work for ears, but 45 does. 40 crashes.
         width = bmp.getWidth(); //Set Width
         height = bmp.getWidth(); //Set Height
         //  height = 300; //For Testing
@@ -144,7 +144,7 @@ public class results extends AppCompatActivity {
         while (y < height){
             while (x < width){
                 pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
-                if (pixel.getBlue() != 255 && topHeadFound == false && y > 40 && x > width / 4) { //If the color is black, the top of the head hasn't been found yet, y is greater than 40 pixels, and x is greater than a quarter of the width...
+                if (pixel.getBlue() != 255 && topHeadFound == false && y > 20 && x > width / 4) { //If the color is black, the top of the head hasn't been found yet, y is greater than 40 pixels, and x is greater than a quarter of the width...
                     topHeadFound = true;
                     topHeadX = x; //Get topHeadX value for analysis.
                     topHeadY = y; //Get topHeadY value for analysis.
@@ -321,7 +321,7 @@ public class results extends AppCompatActivity {
         y = midHeadY;
         while (x < centerMassX) {
             pixel = new PixelObject(Color.red(bmp.getPixel(x, y)), Color.green(bmp.getPixel(x, y)), Color.blue(bmp.getPixel(x, y)), bmp.getPixel(x, y)); //Create new pixel object using values.
-            if (pixel.getBlue() != 255){ //If pixel color is black.
+            if (pixel.getBlue() != 255 && x < centerMassX - 25){ //If pixel color is black. //fixfixfix
                 break;
             }
             x++;
@@ -371,14 +371,15 @@ public class results extends AppCompatActivity {
             if (pixel.getBlue() != 255){ //If the pixel is black.
                 break;
             }
+            x++;
 
-            if (x == 0){
+            if (x == centerMassX){
                 //Set x to x/4 of centerMassX. Can't do it in one operation for some reason.
                 x = centerMassX / 4;
                 x = centerMassX - x;
                 y++; //Try again at new Y coordinate.
             }
-            x++;
+
         }
         Point leftHipPoint = new Point();
         leftHipPoint.set(x,y);
@@ -394,7 +395,7 @@ public class results extends AppCompatActivity {
         while (x > centerMassX){
             pixel = new PixelObject(Color.red(bmp.getPixel(x, y)), Color.green(bmp.getPixel(x, y)), Color.blue(bmp.getPixel(x, y)), bmp.getPixel(x, y)); //Create new pixel object using values.
 
-            if (pixel.getBlue() != 255){ //If pixel is black.
+            if (pixel.getBlue() != 255 && x > centerMassX){ //If pixel is black. fixx
                 break;
             }
 

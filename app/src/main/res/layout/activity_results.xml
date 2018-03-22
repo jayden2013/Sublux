@@ -27,13 +27,14 @@
         android:id="@+id/resultsView"
         android:layout_width="382dp"
         android:layout_height="151dp"
-        android:layout_marginBottom="8dp"
+        android:layout_marginBottom="88dp"
         android:layout_marginEnd="8dp"
         android:layout_marginStart="8dp"
         android:text="Results."
         android:textColor="#FFEC5C"
-        android:textSize="20sp"
+        android:textSize="17sp"
         app:layout_constraintBottom_toBottomOf="parent"
         app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintHorizontal_bias="0.461"
         app:layout_constraintStart_toStartOf="parent" />
 </android.support.constraint.ConstraintLayout>
