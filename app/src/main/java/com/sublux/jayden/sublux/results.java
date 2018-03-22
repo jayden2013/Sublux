@@ -38,7 +38,6 @@ public class results extends AppCompatActivity {
     public void analyzeImage(){
 
         int permissionCheck = ContextCompat.checkSelfPermission(this, Manifest.permission.READ_EXTERNAL_STORAGE);
-        System.out.println("Current Permissions: " + permissionCheck); //Print current permissions to log in Android Studio.
 
         if (permissionCheck != 0) { //If we don't have permissions, request permissions
             ActivityCompat.requestPermissions(this, new String[]{Manifest.permission.READ_EXTERNAL_STORAGE, Manifest.permission.WRITE_EXTERNAL_STORAGE}, 1);
@@ -48,7 +47,6 @@ public class results extends AppCompatActivity {
         final int OFFSET = 45; //Offset for RGB Threshold. 50 doesn't seem to work for ears, but 45 does. 40 crashes.
         width = bmp.getWidth(); //Set Width
         height = bmp.getWidth(); //Set Height
-        System.out.println("width: " + width + " height: " + height);
         //  height = 300; //For Testing
         int x = 0, y = 0; //Initialize X + Y
         int totalPixels = width * height; //Calculate Total Pixel
@@ -82,9 +80,7 @@ public class results extends AppCompatActivity {
         }
 
         result = cleanUp(result);
-        System.out.println("CLEAN UP HEIGHT / WIDTH: " + result.getHeight() + ", " + result.getWidth());
         result = analyzeHead(result);
-        System.out.println("ANALYZED HEIGHT / WIDTH: " + result.getHeight() + ", " + result.getWidth());
 
     }
 
@@ -98,7 +94,6 @@ public class results extends AppCompatActivity {
         PixelObject pixel, nextPixel;
         boolean firstFound = false;
         int x = 0, y = 0;
-        System.out.println("cleaning up");
         while(y < height){
             while (x < width){
                 pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
@@ -186,7 +181,6 @@ public class results extends AppCompatActivity {
                 if (pixel.getBlue() != 255 && bottomYFound == false) { //If the color is black, the top of the head hasn't been found yet, y is greater than 40 pixels, and x is greater than a quarter of the width...
                     bottomYFound = true;
                     bottomY = y;
-                    System.out.println("Y coordinate:" + y);
                     while(x < width) { //This is all for testing.
                         headed.setPixel(x, y, Color.RED);
                         x++;
@@ -201,7 +195,6 @@ public class results extends AppCompatActivity {
         //Determine center mass Y
         int centerMassY = (bottomY - topHeadY) /2;
         //This is all for testing:
-        System.out.println("CENTER MASS Y : " + centerMassY);
         x = 0;
         while (x < width){
             headed.setPixel(x, centerMassY, Color.RED);
@@ -216,7 +209,6 @@ public class results extends AppCompatActivity {
             if (pixel.getBlue() != 255){
                 bottomHeadY = y;
                 //For Testing
-                System.out.println("Found Chin: " + y);
                 x = 0;
                 while (x < width){
                     headed.setPixel(x, bottomHeadY, Color.RED);
@@ -230,7 +222,6 @@ public class results extends AppCompatActivity {
         //Analyze Left Shoulder
         int shoulderLine = 0;
         shoulderLine = centerMassY - bottomHeadY;
-        System.out.println("left shoulder: " + shoulderLine);
         x = 0;
         while (x < width){
             headed.setPixel(x, shoulderLine, Color.WHITE);
@@ -248,7 +239,6 @@ public class results extends AppCompatActivity {
         while(y < shoulderLine){
             pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
             if (pixel.getBlue() != 255){ //If pixel is black
-                System.out.println("Found the shoulder." + y);
                 break;
             }
             y++;
@@ -269,7 +259,6 @@ public class results extends AppCompatActivity {
         while(y < shoulderLine){
             pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
             if (pixel.getBlue() != 255){ //If pixel is black
-                System.out.println("Found the shoulder." + y);
                 break;
             }
             y++;
@@ -286,7 +275,6 @@ public class results extends AppCompatActivity {
         String shoulderResultText = "No posture information available.";
         //Get shoulder posture value.
         shoulder_posture_value = Math.abs(leftShoulderPoint.y - rightShoulderPoint.y);
-        System.out.println(shoulder_posture_value);
         //Check shoulder posture value against shoulder threshold.
         if (shoulder_posture_value > SHOULDER_THRESHOLD){
             leftShoulderHigher = leftShoulderPoint.y > rightShoulderPoint.y;
@@ -320,7 +308,6 @@ public class results extends AppCompatActivity {
                 break;
             }
             x++;
-            System.out.println(x);
             if (x == width){
                 x = 0;
                 y -= 1;

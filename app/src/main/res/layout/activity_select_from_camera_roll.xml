@@ -12,11 +12,13 @@
         android:id="@+id/imageSelectButton"
         android:layout_width="wrap_content"
         android:layout_height="47dp"
-        android:layout_marginStart="52dp"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:background="#F47D4A"
         android:text="Browse"
         app:layout_constraintBottom_toBottomOf="parent"
-        app:layout_constraintStart_toStartOf="@+id/imageView"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toTopOf="parent"
         app:layout_constraintVertical_bias="0.573" />
 
@@ -34,10 +36,13 @@
         android:id="@+id/analysisButton"
         android:layout_width="wrap_content"
         android:layout_height="wrap_content"
+        android:layout_marginEnd="8dp"
+        android:layout_marginStart="8dp"
         android:layout_marginTop="8dp"
         android:background="#F47D4A"
         android:text="Analyze"
-        app:layout_constraintStart_toStartOf="@+id/imageSelectButton"
+        app:layout_constraintEnd_toEndOf="parent"
+        app:layout_constraintStart_toStartOf="parent"
         app:layout_constraintTop_toBottomOf="@+id/imageSelectButton" />
 
     <TextView

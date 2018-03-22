@@ -46,7 +46,6 @@ public class home extends AppCompatActivity {
                 home.super.onActivityResult(requestCode, resultCode, data);
                 if(requestCode == CAMERA_REQUEST && resultCode == Activity.RESULT_OK){
                     Bitmap photo = (Bitmap) data.getExtras().get("data");
-                    System.out.println(photo.getHeight());
                     cameraView.setImageBitmap(photo);
                 }
 

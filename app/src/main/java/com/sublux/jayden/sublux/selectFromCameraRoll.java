@@ -59,10 +59,8 @@ public class selectFromCameraRoll extends AppCompatActivity {
     private void displayResults(){
         Intent results = new Intent(selectFromCameraRoll.this, results.class);
         results.putExtra("imagePath", getImagePath(imageUri)); //Put Extra to access selected image on following screen.
-        System.out.println(imageUri.getEncodedPath());
         startActivity(results);
     }
-
 
     //Open a Gallery View
     private void openGallery(){
@@ -85,21 +83,38 @@ public class selectFromCameraRoll extends AppCompatActivity {
      * @param uri
      * @return
      */
+//    public String getImagePath(Uri uri){
+//        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+//        cursor.moveToFirst();
+//        String document_id = cursor.getString(0);
+//        document_id = document_id.substring(document_id.lastIndexOf(":")+1);
+//        cursor.close();
+//
+//        cursor = getContentResolver().query(
+//                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
+//                null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
+//        cursor.moveToFirst();
+//
+//        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
+//        cursor.close();
+//
+//        return path;
+//    }
+
+
+    /**
+     * https://stackoverflow.com/questions/20324155/get-filepath-and-filename-of-selected-gallery-image-in-android
+     * @param uri
+     * @return
+     */
     public String getImagePath(Uri uri){
-        Cursor cursor = getContentResolver().query(uri, null, null, null, null);
+        String[] projection = { MediaStore.Images.Media.DATA };
+        @SuppressWarnings("deprecation")
+        Cursor cursor = managedQuery(uri, projection, null, null, null);
+        int column_index = cursor
+                .getColumnIndexOrThrow(MediaStore.Images.Media.DATA);
         cursor.moveToFirst();
-        String document_id = cursor.getString(0);
-        document_id = document_id.substring(document_id.lastIndexOf(":")+1);
-        cursor.close();
-
-        cursor = getContentResolver().query(
-                android.provider.MediaStore.Images.Media.EXTERNAL_CONTENT_URI,
-                null, MediaStore.Images.Media._ID + " = ? ", new String[]{document_id}, null);
-        cursor.moveToFirst();
-        String path = cursor.getString(cursor.getColumnIndex(MediaStore.Images.Media.DATA));
-        cursor.close();
-
-        return path;
+        return cursor.getString(column_index);
     }
 
 }
