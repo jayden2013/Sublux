@@ -80,7 +80,7 @@ public class results extends AppCompatActivity {
         }
 
         result = cleanUp(result);
-        result = analyzeHead(result);
+        result = analyze(result);
 
     }
 
@@ -124,11 +124,11 @@ public class results extends AppCompatActivity {
     }
 
     /**
-     * Analyze head posture.
+     * Analyze posture.
      * @return
      */
-    public Bitmap analyzeHead(Bitmap bmp){
-        Bitmap headed = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
+    public Bitmap analyze(Bitmap bmp){
+        Bitmap analyzedImage = Bitmap.createBitmap(width, height, Bitmap.Config.ARGB_8888);
         PixelObject pixel, nextPixel;
         boolean topHeadFound = false;
         int x = 0, y = 0;
@@ -150,15 +150,15 @@ public class results extends AppCompatActivity {
                     topHeadY = y; //Get topHeadY value for analysis.
 
                     while(x < width) { //This is all for testing.
-                        headed.setPixel(x, y, Color.RED);
+                        analyzedImage.setPixel(x, y, Color.RED);
                         x++;
                     }
                 }
                 else if (pixel.getBlue() == 255){
-                    headed.setPixel(x, y, Color.BLUE);
+                    analyzedImage.setPixel(x, y, Color.BLUE);
                 }
                 else{
-                    headed.setPixel(x, y, Color.BLACK);
+                    analyzedImage.setPixel(x, y, Color.BLACK);
                 }
 
                 x++;
@@ -182,7 +182,7 @@ public class results extends AppCompatActivity {
                     bottomYFound = true;
                     bottomY = y;
                     while(x < width) { //This is all for testing.
-                        headed.setPixel(x, y, Color.RED);
+                        analyzedImage.setPixel(x, y, Color.RED);
                         x++;
                     }
                 }
@@ -197,7 +197,7 @@ public class results extends AppCompatActivity {
         //This is all for testing:
         x = 0;
         while (x < width){
-            headed.setPixel(x, centerMassY, Color.RED);
+            analyzedImage.setPixel(x, centerMassY, Color.RED);
             x++;
         }
 
@@ -211,7 +211,7 @@ public class results extends AppCompatActivity {
                 //For Testing
                 x = 0;
                 while (x < width){
-                    headed.setPixel(x, bottomHeadY, Color.RED);
+                    analyzedImage.setPixel(x, bottomHeadY, Color.RED);
                     x++;
                 }
                 break;
@@ -224,7 +224,7 @@ public class results extends AppCompatActivity {
         shoulderLine = centerMassY - bottomHeadY;
         x = 0;
         while (x < width){
-            headed.setPixel(x, shoulderLine, Color.WHITE);
+            analyzedImage.setPixel(x, shoulderLine, Color.WHITE);
             x++;
         }
 
@@ -249,7 +249,7 @@ public class results extends AppCompatActivity {
         }
 
         leftShoulderPoint.set(x, y);
-        headed.setPixel(leftShoulderPoint.x, leftShoulderPoint.y, Color.GREEN);
+        analyzedImage.setPixel(leftShoulderPoint.x, leftShoulderPoint.y, Color.GREEN);
 
         //Find the right shoulder
         x = centerMassX / 4;
@@ -270,7 +270,7 @@ public class results extends AppCompatActivity {
 
         rightShoulderPoint.set(x, y);
 
-        headed.setPixel(rightShoulderPoint.x, rightShoulderPoint.y, Color.GREEN);
+        analyzedImage.setPixel(rightShoulderPoint.x, rightShoulderPoint.y, Color.GREEN);
 
         String shoulderResultText = "No posture information available.";
         //Get shoulder posture value.
@@ -312,6 +312,12 @@ public class results extends AppCompatActivity {
                 x = 0;
                 y -= 1;
             }
+            //ADDED THIS IN TO TRY TO FIX CRASHES
+            if (y == 0){
+                x = 0;
+                y = 0;
+                break;
+            }
         }
         Point rightEarPoint = new Point();
         rightEarPoint.set(x,y);
@@ -329,13 +335,19 @@ public class results extends AppCompatActivity {
                 x = leftShoulderPoint.x;
                 y -= 1;
             }
+            //ADDED THIS IN TO TRY TO FIX CRASHES
+            if (y == 0){
+                x = 0;
+                y = 0;
+                break;
+            }
         }
 
         Point leftEarPoint = new Point();
         leftEarPoint.set(x,y);
 
-        headed.setPixel(rightEarPoint.x, rightEarPoint.y, Color.GREEN);
-        headed.setPixel(leftEarPoint.x, leftEarPoint.y, Color.GREEN);
+        analyzedImage.setPixel(rightEarPoint.x, rightEarPoint.y, Color.GREEN);
+        analyzedImage.setPixel(leftEarPoint.x, leftEarPoint.y, Color.GREEN);
 
         //Check for tilted head.
         int leftShoulderToEar = leftEarPoint.x - leftShoulderPoint.x;
@@ -379,13 +391,17 @@ public class results extends AppCompatActivity {
                 x = centerMassX - x;
                 y++; //Try again at new Y coordinate.
             }
+            //ADDED THIS TO TRY FIXING CRASH.
+            if (y == height){
+                break;
+            }
 
         }
         Point leftHipPoint = new Point();
         leftHipPoint.set(x,y);
 
         //Testing.
-        headed.setPixel(leftHipPoint.x, leftHipPoint.y, Color.YELLOW);
+        analyzedImage.setPixel(leftHipPoint.x, leftHipPoint.y, Color.YELLOW);
 
         //Right hip
         y = centerMassY;
@@ -404,6 +420,12 @@ public class results extends AppCompatActivity {
                 x = centerMassX + x;
                 y++;
             }
+
+            //ADDED THIS TO TRY FIXING CRASH.
+            if (y == height){
+                break;
+            }
+
             x--;
         }
 
@@ -411,7 +433,7 @@ public class results extends AppCompatActivity {
         rightHipPoint.set(x,y);
 
         //Testing
-        headed.setPixel(rightHipPoint.x, rightHipPoint.y, Color.YELLOW);
+        analyzedImage.setPixel(rightHipPoint.x, rightHipPoint.y, Color.YELLOW);
 
         String hipText;
         //Check Hip Values
@@ -423,7 +445,7 @@ public class results extends AppCompatActivity {
         }
         resultsString.append(hipText);
 
-        return headed; //Return an offset maybe of how offset the posture is?
+        return analyzedImage; //Return an offset maybe of how offset the posture is?
     }
 
     /**
