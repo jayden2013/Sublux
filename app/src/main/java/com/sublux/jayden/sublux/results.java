@@ -10,6 +10,7 @@ import android.os.Bundle;
 import android.support.v4.app.ActivityCompat;
 import android.support.v4.content.ContextCompat;
 import android.support.v7.app.AppCompatActivity;
+import android.view.View;
 import android.widget.ImageView;
 import android.widget.TextView;
 
@@ -28,8 +29,15 @@ public class results extends AppCompatActivity {
         setContentView(R.layout.activity_results);
         Intent i = getIntent();
         this.imagePath = i.getStringExtra("imagePath"); //Set Image Path
-        analyzeImage();
-        displayResults();
+        try {
+            analyzeImage();
+            displayResults();
+        } catch(Exception e){ //Instead of crashing, tell the user the analysis failed.
+            final ImageView modifiedImageView = (ImageView) findViewById(R.id.resultView);
+            modifiedImageView.setVisibility(View.INVISIBLE); //Make image view invisible.
+            TextView resultsView = (TextView) findViewById(R.id.resultsView);
+            resultsView.setText("Failed to analyze image. For best results use adequate lighting and a solid background.");
+        }
     }
 
     /**
@@ -160,7 +168,6 @@ public class results extends AppCompatActivity {
                 else{
                     analyzedImage.setPixel(x, y, Color.BLACK);
                 }
-
                 x++;
             }
             y++;
@@ -223,12 +230,10 @@ public class results extends AppCompatActivity {
         int shoulderLine = 0;
         shoulderLine = centerMassY - bottomHeadY;
         x = 0;
-        while (x < width){
+        while (x < width) {
             analyzedImage.setPixel(x, shoulderLine, Color.WHITE);
             x++;
         }
-
-        int shoulderWhereAbouts = bottomHeadY - shoulderLine;
 
         y = bottomHeadY;
         //Set x to x/4 of centerMassX. Can't do it in one operation for some reason.
@@ -245,6 +250,9 @@ public class results extends AppCompatActivity {
             if (y == shoulderLine){ //If we made it to the shoulder line without finding a suspected shoulder, restart with x - 1;
                 y = bottomHeadY;
                 x -= 1;
+            }
+            if (x == 0){
+                break;
             }
         }
 
@@ -265,6 +273,9 @@ public class results extends AppCompatActivity {
             if (y == shoulderLine){
                 y = bottomHeadY;
                 x += 1;
+            }
+            if (x == width - 1){
+                break;
             }
         }
 
@@ -308,7 +319,7 @@ public class results extends AppCompatActivity {
                 break;
             }
             x++;
-            if (x == width){
+            if (x == width - 1){
                 x = 0;
                 y -= 1;
             }
