@@ -142,11 +142,11 @@ public class results extends AppCompatActivity {
         int x = 0, y = 0;
         pixel = new PixelObject(Color.red(bmp.getPixel(x,y)), Color.green(bmp.getPixel(x,y)), Color.blue(bmp.getPixel(x,y)), bmp.getPixel(x,y)); //Create new pixel object using values.
         int topHeadX = 0, topHeadY = 0, centerMassX = 0;
-        final int SHOULDER_THRESHOLD = 10; //The acceptable threshold for shoulder comparisons. Anything outside of this will be considered bad posture.
+        final int SHOULDER_THRESHOLD = height / 60; //The acceptable threshold for shoulder comparisons. Anything outside of this will be considered bad posture.
         int shoulder_posture_value = 0;
         boolean leftShoulderHigher = false;
-        int SHOULDER_TO_EAR_THRESHOLD = 15; //The acceptable threshold for shoulder to ear comparisons. Anything outside of this will be considered bad posture. Checks for tilted heads.
-        int HIP_WIDTH_THRESHOLD = 25; //The acceptable threshold for centered hip comparisons.
+        int SHOULDER_TO_EAR_THRESHOLD = width / 50; //The acceptable threshold for shoulder to ear comparisons. Anything outside of this will be considered bad posture. Checks for tilted heads.
+        int HIP_WIDTH_THRESHOLD = width / 45; //The acceptable threshold for centered hip comparisons.
 
         //Determine the coordinates of the top of the head. Also the center mass X coordinate.
         while (y < height){
@@ -173,6 +173,7 @@ public class results extends AppCompatActivity {
             y++;
             x = 0;
         }
+
         centerMassX = topHeadX; //The center mass X coordinate and the top head X coordinate are the same. Using different variables for easier understanding.
 
         //Determine foot coordinate.
